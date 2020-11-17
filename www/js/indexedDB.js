@@ -84,7 +84,7 @@ window.onload = function() {
             service: serviceRating, clean: cleanRating, food : foodRating, note: Note, reporter: Reporter });
     
         request.onsuccess = function (event) {
-            displayData();
+            // displayData();
             alert(`${nameRestaurant}  has been added to your database.`);
             };
             request.onerror = function (event) {
