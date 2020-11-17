@@ -1,4 +1,4 @@
-window.onload = function() {
+window.onload = function () {
 
     window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB ||
         window.msIndexedDB;
@@ -6,25 +6,25 @@ window.onload = function() {
         window.msIDBTransaction;
     window.IDBKeyRange = window.IDBKeyRange ||
         window.webkitIDBKeyRange || window.msIDBKeyRange;
-    
+
     if (!window.indexedDB) {
-            window.alert("Your browser doesn't support a stable version of IndexedDB.");
-        }
-    
-    var restaurantData ;
+        window.alert("Your browser doesn't support a stable version of IndexedDB.");
+    }
+
+    var restaurantData;
     var db;
     var request = window.indexedDB.open('RestaurantDB', 1);
     var tableDB = document.getElementById('tableDB');
     var notificationBtn = document.getElementById('enable');
     var form = document.getElementById('first_form');
     var idAuto = document.getElementById('r-id');
-    
-    if(Notification.permission === 'denied' || Notification.permission === 'default') {
+
+    if (Notification.permission === 'denied' || Notification.permission === 'default') {
         notificationBtn.style.display = 'block';
     } else {
         notificationBtn.style.display = 'none';
     }
-    
+
     request.onerror = function (event) {
         console.log('error: ');
     };
@@ -32,27 +32,27 @@ window.onload = function() {
         db = request.result;
         displayData();
     };
-    
+
     request.onupgradeneeded = function (event) {
         var db = event.target.result;
         var objectStore = db.createObjectStore('RestaurantDB', { keyPath: 'id', autoIncrement: true });
-        objectStore.createIndex("name","name",{unique: false});
-        objectStore.createIndex("type","type",{unique: false});
-        objectStore.createIndex("date","date",{unique: false});
-        objectStore.createIndex("time","time",{unique: false});
-        objectStore.createIndex("price","price",{unique: false});
-        objectStore.createIndex("service","service",{unique: false});
-        objectStore.createIndex("clean","clean",{unique: false});
-        objectStore.createIndex("food","food",{unique: false});
-        objectStore.createIndex("note","note",{unique: false});
-        objectStore.createIndex("reporter","reporter",{unique: false});
+        objectStore.createIndex("name", "name", { unique: false });
+        objectStore.createIndex("type", "type", { unique: false });
+        objectStore.createIndex("date", "date", { unique: false });
+        objectStore.createIndex("time", "time", { unique: false });
+        objectStore.createIndex("price", "price", { unique: false });
+        objectStore.createIndex("service", "service", { unique: false });
+        objectStore.createIndex("clean", "clean", { unique: false });
+        objectStore.createIndex("food", "food", { unique: false });
+        objectStore.createIndex("note", "note", { unique: false });
+        objectStore.createIndex("reporter", "reporter", { unique: false });
         for (var i in restaurantData) {
             objectStore.add(restaurantData[i]);
         }
     };
-    
-    
-    
+
+
+
     $(document).ready(function () {
         $('.add-row').click(function () {
             var id = $('#r-id').val();
@@ -67,40 +67,43 @@ window.onload = function() {
             var food = $('#food-r').val();
             var note = $('#note').val();
             var reporter = $('#reporter').val();
-           
-            add(id, name,picture, type,date, time, price, service, clean, food, note, reporter);
-          
+
+            add(id, name, picture, type, date, time, price, service, clean, food, note, reporter);
+
         });
     });
-    
-    
-    function add(idRestaurant, nameRestaurant,pictureRestaurant, typeRestaurant, dateVisit, timeVisit, pricePerOne,
+
+
+    function add(idRestaurant, nameRestaurant, pictureRestaurant, typeRestaurant, dateVisit, timeVisit, pricePerOne,
         serviceRating, cleanRating, foodRating, Note, Reporter) {
-    
+
         var request = db
             .transaction(['RestaurantDB'], 'readwrite')
             .objectStore('RestaurantDB')
-            .add({ id: idRestaurant, name: nameRestaurant, picture: pictureRestaurant, type: typeRestaurant,date:dateVisit, time: timeVisit, price: pricePerOne,
-            service: serviceRating, clean: cleanRating, food : foodRating, note: Note, reporter: Reporter });
-    
+            .add({
+                id: idRestaurant, name: nameRestaurant, picture: pictureRestaurant, type: typeRestaurant, date: dateVisit, time: timeVisit, price: pricePerOne,
+                service: serviceRating, clean: cleanRating, food: foodRating, note: Note, reporter: Reporter
+            });
+
         request.onsuccess = function (event) {
             // displayData();
             alert(`${nameRestaurant}  has been added to your database.`);
-            };
-            request.onerror = function (event) {
+        };
+        request.onerror = function (event) {
             alert(
-            `Unable to add data\r\n ${idRestaurant} is already exist in your database! `
+                `Unable to add data\r\n ${idRestaurant} is already exist in your database! `
             );
         };
+        return 0;
     }
-    
-    
-    function displayData(idRestaurant, nameRestaurant,pictureRestaurant, typeRestaurant,dateVisit, timeVisit,pricePerOne,serviceRating,
-        cleanRating,foodRating,Note,Reporter) {
+
+
+    function displayData(idRestaurant, nameRestaurant, pictureRestaurant, typeRestaurant, dateVisit, timeVisit, pricePerOne, serviceRating,
+        cleanRating, foodRating, Note, Reporter) {
         tableDB.innerHTML = "";
         var objectStore = db.transaction('RestaurantDB').objectStore('RestaurantDB');
         objectStore.openCursor().onsuccess = function (event) {
-        var cursor = event.target.result;
+            var cursor = event.target.result;
             if (cursor) {
                 var trItem = document.createElement('tr');
                 idRestaurant = cursor.value.id;
@@ -115,15 +118,15 @@ window.onload = function() {
                 foodRating = cursor.value.food;
                 Note = cursor.value.note;
                 Reporter = cursor.value.reporter;
-    
-                pictureRestaurant = "<img width='100px' height='100px' src='"+
-                'data:image/jpeg;base64,' + btoa(cursor.value.data)+
-                "'/>";
-    
+
+                pictureRestaurant = "<img width='100px' height='100px' src='" +
+                    'data:image/jpeg;base64,' + btoa(cursor.value.data) +
+                    "'/>";
+
                 trItem.innerHTML = `<tr></td><td>${idRestaurant}</td><td>${nameRestaurant}</td><td>${pictureRestaurant}</td><td>
                 ${typeRestaurant}</td><td>${dateVisit}</td><td>${timeVisit}</td><td>${pricePerOne}</td><td>${serviceRating}</td>
                 <td>${cleanRating}</td><td>${foodRating}</td><td>${Note}</td><td>${Reporter}</td></tr>`;
-    
+
                 var deleteButton = document.createElement('button');
                 var editButton = document.createElement('button')
                 editButton.innerHTML = `<tr><td>Edit</td></tr>`
@@ -133,24 +136,25 @@ window.onload = function() {
                 // here we are setting a data attribute on our delete button to say what task we want deleted if it is clicked!
                 deleteButton.setAttribute('data-task', cursor.value.id);
                 editButton.setAttribute('data-edit', cursor.value.id);
-                deleteButton.onclick = function(event) {
-                deleteItem(event);
+                deleteButton.onclick = function (event) {
+                    deleteItem(event);
                 }
-                editButton.onclick = function(event){
+                editButton.onclick = function (event) {
                     editItem(event);
                 }
-                
+
                 tableDB.appendChild(trItem);
-    
-            cursor.continue();}
-    
+
+                cursor.continue();
+            }
+
             else {
                 console.log("error");
-    
+
             }
         }
     }
-    $('#updateBtn').click(function () { 
+    $('#updateBtn').click(function () {
         var id = $('#r-id').val();
         var name = $('#r-name').val();
         var picture = $('#r-picture').val();
@@ -163,33 +167,33 @@ window.onload = function() {
         var food = $('#food-r').val();
         var note = $('#note').val();
         var reporter = $('#reporter').val();
-        var idEdit = parseInt($('#txtSearch').val());  
-        var transaction = db.transaction(["RestaurantDB"], "readwrite");  
-        var objectStore = transaction.objectStore("RestaurantDB");  
-        var request = objectStore.get(idEdit);  
-      
-        request.onsuccess = function (event) {  
-    
-            request.result.idRestaurant = id;  
-            request.result.nameRestaurant = name; 
-            request.result.pictureRestaurant = picture;  
-            request.result.typeRestaurant = type; 
-            request.result.dateVisit = date; 
-            request.result.timeVisit = time; 
-            request.result.pricePerOne = price; 
-            request.result.serviceRating = service; 
-            request.result.cleanRating = clean; 
-            request.result.foodRating = food; 
-            request.result.Note = note; 
-            request.result.Reporter = reporter;  
-            objectStore.put(request.result);  
-            alert('Recored Updated Successfully !!!');  
-        };   
+        var idEdit = parseInt($('#txtSearch').val());
+        var transaction = db.transaction(["RestaurantDB"], "readwrite");
+        var objectStore = transaction.objectStore("RestaurantDB");
+        var request = objectStore.get(idEdit);
+
+        request.onsuccess = function (event) {
+
+            request.result.idRestaurant = id;
+            request.result.nameRestaurant = name;
+            request.result.pictureRestaurant = picture;
+            request.result.typeRestaurant = type;
+            request.result.dateVisit = date;
+            request.result.timeVisit = time;
+            request.result.pricePerOne = price;
+            request.result.serviceRating = service;
+            request.result.cleanRating = clean;
+            request.result.foodRating = food;
+            request.result.Note = note;
+            request.result.Reporter = reporter;
+            objectStore.put(request.result);
+            alert('Recored Updated Successfully !!!');
+        };
     })
-    function editItem(event){
-      
+    function editItem(event) {
+
     }
-    
+
     // $(document).ready(function () {
     // $('#btnShow').click(function () {  
     //     debugger;  
@@ -210,30 +214,29 @@ window.onload = function() {
     //             $('#note').val(r.note);  
     //             $('#reporter').val(r.reporter);  
     //         } else {  
-               
+
     //             alert('Record Does not exist');  
     //         }  
-    
+
     //     };  
     // });
-        
-    
-     
+
+
+
     function deleteItem(event) {
         // retrieve the name of the task we want to delete
         var dataTask = event.target.getAttribute('data-task');
-    
+
         // open a database transaction and delete the task, finding it by the name we retrieved above
         var transaction = db.transaction(["RestaurantDB"], "readwrite");
         var request = transaction.objectStore("RestaurantDB").delete(dataTask);
-    
+
         // report that the data item has been deleted
-        transaction.oncomplete = function() {
+        transaction.oncomplete = function () {
             // delete the parent of the button, which is the list item, so it no longer is displayed
             event.target.parentNode.parentNode.removeChild(event.target.parentNode);
         };
     };
-    };
-    
-    
-    
+};
+
+
